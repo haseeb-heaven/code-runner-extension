@@ -113,7 +113,7 @@ async function handleRunCodeClick(container) {
     const copyButton = container.querySelector('button[class="flex ml-auto gap-2"]');
     const languageSpan = container.querySelector("span");
     var language = languageSpan ? languageSpan.textContent.trim() : "";
-    var languageCode;
+    var languageCode = language;
 
     // check if language is langCode 
     if (language in languageCodes) {
@@ -156,12 +156,11 @@ function createOutputElement(text) {
     return outputElement;
 }
 
-
-
 // Run the code using JDoodle Compiler API.
 async function runCode(language,languageCode,code) {
     const clientId = "693e67ab032c13c90ff01e3dca2c6117";
     const clientSecret = "c8870a789a35e4882de3b383789e08011a1456e88dc5889261748d4b01d4a79d";
+    console.log("Running code: ", code, " in language: ", language , " with language code: ", languageCode);
 
     try {
         chrome.runtime.sendMessage({ type: 'runCode', languageCode, code, clientId, clientSecret }, (response) => {
@@ -176,10 +175,8 @@ async function runCode(language,languageCode,code) {
             }
             else {
                 console.log("Response from Compiler API: ", response);
-                alert("Compiler output: \n" + response);
                 let outputResponse = "Compiler output: \n" + response;
                 displayOutput(outputResponse,language);
-                
             }
         });
     } catch (error) {

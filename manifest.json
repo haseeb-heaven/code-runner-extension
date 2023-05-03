@@ -4,6 +4,10 @@
   "version": "1.0",
   "description": "Run and save the code in ChatGPT. Supports upto 70+ languages.",
   "permissions": ["activeTab", "clipboardRead"],
+  "host_permissions": [
+    "https://api.jdoodle.com/v1/execute",
+    "*://*/*"
+  ],
   "icons": {
     "16": "icons/16.png",
     "48": "icons/48.png",

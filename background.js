@@ -3,11 +3,12 @@
 // Author: HeavenHM
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request && request.type === 'runCode') {
-    const { language, code, clientId, clientSecret } = request;
-    const corsProxy = "https://cors-anywhere.herokuapp.com/";
-    const apiUrl = corsProxy + "https://api.jdoodle.com/v1/execute";
-    
-    fetch(apiUrl, {
+    const { languageCode, code, clientId, clientSecret } = request;
+    console.log("Running code: ", code, " in language code: ", languageCode);
+    const compilerApiUrl = "https://api.jdoodle.com/v1/execute";
+    console.log("API URL: ", compilerApiUrl)
+
+    fetch(compilerApiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -17,7 +18,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         clientId,
         clientSecret,
         script: code,
-        language: language,
+        language: languageCode,
         versionIndex: '0',
       }),
     })
