@@ -39,7 +39,7 @@ const languageCodes = {
     "objective-c": "objc",
     "javascript": "nodejs",
     "python": "python3",
-    "basic":"freebasic",
+    "basic": "freebasic",
 };
 
 // Creating Save and Run Code buttons.
@@ -124,7 +124,7 @@ async function handleRunCodeClick(container) {
         copyButton.click();
         try {
             const clipboardData = await navigator.clipboard.readText();
-            runCode(language,languageCode,clipboardData);
+            runCode(language, languageCode, clipboardData);
         } catch (err) {
             console.error("Failed to read clipboard data:", err);
         }
@@ -156,11 +156,22 @@ function createOutputElement(text) {
     return outputElement;
 }
 
+async function getApiKeyAndSecret() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.get(['apiKey', 'apiSecret'], (result) => {
+        if (!result.apiKey || !result.apiSecret) {
+          reject(new Error('API Key or Secret not set'));
+        } else {
+          resolve({ clientId: result.apiKey, clientSecret: result.apiSecret });
+        }
+      });
+    });
+  }
+
 // Run the code using JDoodle Compiler API.
-async function runCode(language,languageCode,code) {
-    const clientId = "693e67ab032c13c90ff01e3dca2c6117";
-    const clientSecret = "c8870a789a35e4882de3b383789e08011a1456e88dc5889261748d4b01d4a79d";
-    console.log("Running code: ", code, " in language: ", language , " with language code: ", languageCode);
+async function runCode(language, languageCode, code) {
+    console.log("Running code: ", code, " in language: ", language, " with language code: ", languageCode);
+    const { clientId, clientSecret } = await getApiKeyAndSecret();
 
     try {
         chrome.runtime.sendMessage({ type: 'runCode', languageCode, code, clientId, clientSecret }, (response) => {
@@ -176,7 +187,7 @@ async function runCode(language,languageCode,code) {
             else {
                 console.log("Response from Compiler API: ", response);
                 let outputResponse = "Compiler output: \n" + response;
-                displayOutput(outputResponse,language);
+                displayOutput(outputResponse, language);
             }
         });
     } catch (error) {
