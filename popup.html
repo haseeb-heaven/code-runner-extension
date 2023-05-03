@@ -2,15 +2,16 @@
 <html>
 <head>
   <title>Extension Popup</title>
-  <style>
-    /* Add your custom styles here */
-  </style>
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <!-- Your popup content -->
-
-  <a href="#" id="options-link">Settings</a>
-
-  <script src="popup.js"></script>
+  <div id="container">
+    <div id="header">
+      <img src="icons/48.png" alt="Logo" id="logo">
+      <h3>Chat-GPT Code Runner</h3>
+    </div>
+    <a href="#" id="options-link">Settings</a>
+  </div>
+  <script src="popup.js" type="module"></script>
 </body>
 </html>

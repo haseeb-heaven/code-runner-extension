@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Extension Settings</title>
   <style>
     /* Add your custom styles here */
     body {
       font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      background-color: #141313b1; 
     }
 
     h1 {
       text-align: center;
-      color: #444;
+      color: #ffffff85;
     }
-
+    
     form {
       margin: 0 auto;
       max-width: 400px;
       padding: 20px;
-      background-color: #fff;
+      background-color: #ffffff85;
       border-radius: 5px;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     }
 
     label {
@@ -29,7 +30,8 @@
       color: #444;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    input[type="number"] {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
@@ -38,6 +40,25 @@
       box-sizing: border-box;
       font-size: 16px;
       color: #444;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      box-sizing: border-box;
+      font-size: 16px;
+      color: #444;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23333' d='M2 3.5L4 5V0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right .7em top 50%;
+      background-size: 8px 10px;
     }
 
     button[type="submit"] {
@@ -56,18 +77,73 @@
     button[type="submit"]:hover {
       background-color: #0062cc;
     }
+
+    .footer {
+      max-width: 400px;
+      margin: 30px auto 20px;
+      text-align: center;
+    }
+
+    .footer a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
   </style>
 </head>
+
 <body>
-  <h1>Settings</h1>
+  <h1>ChatGPT Code Runner Settings</h1>
   <form id="settings-form">
-    <h1>Compiler Settings</h1>
+    <h2>Compiler Settings</h2>
     <label for="api-key">API Key:</label>
     <input type="text" id="api-key" name="api-key">
     <label for="api-secret">API Secret:</label>
     <input type="text" id="api-secret" name="api-secret">
+
+    <h2>Theme Settings</h2>
+    <label for="theme">Choose a theme:</label>
+    <select id="theme" name="theme">
+      <option value="emerald_water">Emerald Water</option>
+      <option value="midnight_sky">Midnight Sky</option>
+      <option value="midnight_plum">Midnight Plum</option>
+      <option value="classic">Classic</option>
+      <option value="royal_purple">Royal Purple</option>
+      <option value="sunny_day">Sunny Day</option>
+      <option value="ocean_breeze">Ocean Breeze</option>
+      <option value="cherry_blossom">Cherry Blossom</option>
+      <option value="fire_engine">Fire Engine</option>
+      <option value="forest_green">Forest Green</option>
+    </select>
+    
+    <h2>File Settings</h2>
+    <label for="file-name">Default file name:</label>
+    <input type="text" id="file-name" name="file-name">
+    <label for="file-extension">Default file extension:</label>
+    <input type="text" id="file-extension" name="file-extension">
+
+    <h2>Output Settings</h2>
+    <label for="output-type">Choose output type:</label>
+    <select id="output-type" name="output-type">
+      <option value="codeblock">Output in codeblock</option>
+      <option value="ui">Output to UI</option>
+    </select>
+
     <button type="submit">Save</button>
   </form>
+
+  <div class="footer">
+    <p>📫 How to reach me: <a href="https://twitter.com/haseeb_heaven" target="_blank">Twitter</a></p>
+    <p>💵 Support me at <a href="https://www.buymeacoffee.com/haseebheaven" target="_blank">Buymeacoffee</a></p>
+    <p>📫 Follow me on YouTube: <a href="https://www.youtube.com/@HaseebMir91/videos" target="_blank">YouTube</a></p>
+    <p>Follow me on Github: <a href="https://github.com/haseeb-heaven" target="_blank">GitHub</a></p>
+  </div>
+
   <script src="options.js"></script>
 </body>
-</html> 
+
+</html>

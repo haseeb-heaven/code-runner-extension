@@ -44,7 +44,28 @@ const languageCodes = {
     "basic": "freebasic",
 };
 
-// Create a method which takes color name and returns hex code.
+const themes = [
+    { name: 'emerald_water', color_fg: '#2ecc71', color_bg: '#2eec7f' },
+    { name: 'midnight_sky', color_fg: '#2c3e50', color_bg: '#34495e' },
+    { name: 'midnight_plum', color_fg: '#4b0082', color_bg: '#483d8b' },
+    { name: 'classic', color_fg: '#808080', color_bg: '#f2f2f2' },
+    { name: 'royal_purple', color_fg: '#6A1B9A', color_bg: '#9C27B0' },
+    { name: 'sunny_day', color_fg: '#FFEB3B', color_bg: '#FFC107' },
+    { name: 'ocean_breeze', color_fg: '#039be5', color_bg: '#03a9f4' },
+    { name: 'cherry_blossom', color_fg: '#e91e63', color_bg: '#ff80ab' },
+    { name: 'fire_engine', color_fg: '#d50000', color_bg: '#f44336' },
+    { name: 'forest_green', color_fg: '#006400', color_bg: '#228B22' }
+  ];
+  
+  
+// Method to get the theme code from the theme name.
+function getThemeColors(themeName) {
+    const theme = themes.find((theme) => theme.name.toLowerCase() === themeName.toLowerCase());
+    const themeColors = theme ? [theme.color_fg, theme.color_bg] : ['#2ecc71', '#2eec7f'];
+    return themeColors;
+}
+
+// Method to convert colour name to hex code.
 function colourNameToHex(colour) {
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 1;
@@ -59,33 +80,32 @@ function colourNameToHex(colour) {
 }
 
 // Utility function to apply the same theme to buttons
-
-function applyButtonTheme(button, colorStyle = "green", backgroundColorStyle = "gray", displayStyle = "inline-block") {
+function applyButtonTheme(button, colorStyle = "green", backgroundColorStyle = "gray",rawColorsHex = false, displayStyle = "inline-block") {
     button.classList.add("flex", "ml-auto", "gap-2");
     button.style.padding = "2px 10px";
     button.style.border = "1px solid #fff";
     button.style.borderRadius = "20px";
-    button.style.color = colourNameToHex(colorStyle);
-    button.style.backgroundColorStyle = colourNameToHex(backgroundColorStyle);
+    button.style.color = rawColorsHex ? colorStyle : colourNameToHex(colorStyle);
+    button.style.backgroundColorStyle = rawColorsHex ? backgroundColorStyle : colourNameToHex(backgroundColorStyle);
     button.style.fontWeight = "300";
     button.style.marginRight = "10px";
     button.style.display = displayStyle;
 }
 
 // Creating the save and run code buttons.
-function createSaveFileButton() {
+function createSaveFileButton(colorStyle = "green", backgroundColorStyle = "gray",rawColorsHex = false) {
     const button = document.createElement("button");
     button.textContent = "Save code";
     button.id = "save-code-btn";
-    applyButtonTheme(button, "green", "gray");
+    applyButtonTheme(button, colorStyle, backgroundColorStyle,rawColorsHex);
     return button;
 }
 
-function createRunCodeButton() {
+function createRunCodeButton(colorStyle = "green", backgroundColorStyle = "gray",rawColorsHex = false) {
     const button = document.createElement("button");
     button.textContent = "Run code";
     button.id = "run-code-btn";
-    applyButtonTheme(button);
+    applyButtonTheme(button, colorStyle, backgroundColorStyle,rawColorsHex);
     return button;
 }
 
@@ -137,6 +157,19 @@ async function handleRunCodeClick(container) {
         }
     }
 }
+
+// Get the settings from the storage.
+async function getSettings() {
+    return new Promise((resolve) => {
+        chrome.storage.sync.get(
+            ['apiKey', 'apiSecret', 'theme', 'fileName', 'fileExtension', 'outputType'],
+            (result) => {
+                resolve(result);
+            }
+        );
+    });
+}
+
 
 // Display the output in the code container.
 function displayOutput(outputText, language) {
@@ -194,7 +227,7 @@ async function runCode(language, languageCode, code) {
     chrome.runtime.sendMessage({ type: 'runCode', languageCode, code, clientId, clientSecret }, (response) => {
         if (response && response.status === 200) {
             console.log("Response from Compiler: ", response);
-            let outputResponse = "Compiler output: \n" + response;
+            let outputResponse = "Compiler output: \n" + response.output;
             displayOutput(outputResponse, language);
         } else {
             console.error("Error while running code: ", response.error);
@@ -224,24 +257,31 @@ async function saveToFile(extension, data) {
 }
 
 // Add Save and Run Code buttons to all code containers.
-function addButtonToContainers() {
+async function addButtonToContainers() {
     const containers = document.querySelectorAll('.flex.items-center.relative.text-gray-200.bg-gray-800.px-4.py-2.text-xs.font-sans.justify-between.rounded-t-md');
+    
+    // Get the theme settings
+    const settings = await getSettings();
+    var theme = settings.theme;
+    theme = theme ? theme : "emerald_water";
+    const [fgColor, bgColor] = getThemeColors(theme);
+
     containers.forEach(container => {
         const existingFileButton = container.querySelector("#save-code-btn");
         if (!existingFileButton) {
-            const button = createSaveFileButton();
+            const button = createSaveFileButton(fgColor,bgColor,true);
             container.appendChild(button);
             button.addEventListener("click", () => handleSaveFileClick(container));
         }
 
         const existingRunCodeButton = container.querySelector("#run-code-btn");
         if (!existingRunCodeButton) {
-            const button = createRunCodeButton();
+            const button = createRunCodeButton(fgColor,bgColor,true);
             container.appendChild(button);
             button.addEventListener("click", () => handleRunCodeClick(container));
         }
         const copyButton = container.querySelector('button[class="flex ml-auto gap-2"]');
-        applyButtonTheme(copyButton);
+        applyButtonTheme(copyButton,fgColor,bgColor,true);
         removeSvgIcon();
     });
 

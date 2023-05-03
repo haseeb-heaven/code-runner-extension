@@ -1,0 +1,59 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #container {
+    width: 300px;
+    padding: 16px;
+  }
+  
+  #header {
+    display: flex;
+    align-items: center;
+  }
+  
+  #logo {
+    width: 48px;
+    height: 48px;
+    margin-right: 8px;
+  }
+  
+  #code-input {
+    width: 100%;
+    padding: 8px;
+    margin: 16px 0;
+    box-sizing: border-box;
+  }
+  
+  #button-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  #run-code {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  #save-code {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  #options-link {
+    display: block;
+    margin-top: 16px;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
