@@ -33,6 +33,8 @@ const supportedLanguages = {
 
 // List of language codes supported by JDoodle Compiler API.
 const languageCodes = {
+    "c++": "cpp17",
+    "cpp": "cpp14",
     "cs": "csharp",
     "objective-c": "objc",
     "javascript": "nodejs",
@@ -111,30 +113,58 @@ async function handleRunCodeClick(container) {
     const copyButton = container.querySelector('button[class="flex ml-auto gap-2"]');
     const languageSpan = container.querySelector("span");
     var language = languageSpan ? languageSpan.textContent.trim() : "";
-    
+    var languageCode;
+
     // check if language is langCode 
     if (language in languageCodes) {
-        language = languageCodes[language];
+        languageCode = languageCodes[language];
     }
 
     if (copyButton) {
         copyButton.click();
         try {
             const clipboardData = await navigator.clipboard.readText();
-            runCode(language, clipboardData);
+            runCode(language,languageCode,clipboardData);
         } catch (err) {
             console.error("Failed to read clipboard data:", err);
         }
     }
 }
 
+function displayOutput(outputText, language) {
+    const containers = document.querySelectorAll('.p-4.overflow-y-auto');
+    containers.forEach(container => {
+        const languageClass = `language-${language}`;
+        const hasLanguageChild = container.querySelector(`.\\!whitespace-pre.hljs.${languageClass}`);
+
+        if (hasLanguageChild) {
+            const existingOutputElement = container.querySelector(".output-text");
+            if (!existingOutputElement) {
+                const outputElement = createOutputElement(outputText);
+                container.appendChild(outputElement);
+            } else {
+                existingOutputElement.textContent = outputText;
+            }
+        }
+    });
+}
+
+function createOutputElement(text) {
+    const outputElement = document.createElement('div');
+    outputElement.classList.add('output-text');
+    outputElement.textContent = text;
+    return outputElement;
+}
+
+
+
 // Run the code using JDoodle Compiler API.
-async function runCode(language, code) {
+async function runCode(language,languageCode,code) {
     const clientId = "693e67ab032c13c90ff01e3dca2c6117";
     const clientSecret = "c8870a789a35e4882de3b383789e08011a1456e88dc5889261748d4b01d4a79d";
 
     try {
-        chrome.runtime.sendMessage({ type: 'runCode', language, code, clientId, clientSecret }, (response) => {
+        chrome.runtime.sendMessage({ type: 'runCode', languageCode, code, clientId, clientSecret }, (response) => {
             // Check if repsone is valid
             if (!response) {
                 console.error("Response from Compiler API is invalid");
@@ -147,6 +177,8 @@ async function runCode(language, code) {
             else {
                 console.log("Response from Compiler API: ", response);
                 alert("Compiler output: \n" + response);
+                let outputResponse = "Compiler output: \n" + response;
+                displayOutput(outputResponse,language);
                 
             }
         });
