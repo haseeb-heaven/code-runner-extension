@@ -160,17 +160,28 @@ async function handleRunCodeClick(container) {
     }
 }
 
-async function getSettings() {
+async function getSettings(initialRun = false) {
     try {
         return new Promise((resolve, reject) => {
             chrome.storage.sync.get(
                 ['apiKey', 'apiSecret', 'theme', 'fileName', 'fileExtension', 'outputType'],
                 (result) => {
                     if (!result.apiKey || !result.apiSecret) {
-                        const errorMsg = "API Key or Secret not set\nPlease go to extension options and set them";
-                        console.error(errorMsg);
-                        alert(errorMsg);
-                        reject(new Error(errorMsg));
+                        if (!initialRun) {
+                            const errorMsg = "Chat-GPT Code Runner:\nAPI Key or Secret not set\nPlease go to extension settings and set them";
+                            console.error(errorMsg);
+                            alert(errorMsg);
+                            reject(new Error(errorMsg));
+                        }
+                        else{
+                            const settings = {
+                                theme: result.theme,
+                                fileName: result.fileName,
+                                fileExtension: result.fileExtension,
+                                outputType: result.outputType,
+                            };
+                            resolve(settings);
+                        }
                     } else {
                         const settings = {
                             clientId: result.apiKey,
@@ -210,102 +221,102 @@ function displayOutput(outputText, language) {
         });
     }
     catch (error) {
-        console.err("Error in displayOutput: ", error);
+        console.error("Error in displayOutput: ", error);
         // Display the output using alert.
         alert(outputText);
     }
 }
 
-    // Create the output element.
-    function createOutputElement(text) {
-        const outputElement = document.createElement('div');
-        outputElement.classList.add('output-text');
-        outputElement.textContent = text;
-        return outputElement;
-    }
+// Create the output element.
+function createOutputElement(text) {
+    const outputElement = document.createElement('div');
+    outputElement.classList.add('output-text');
+    outputElement.textContent = text;
+    return outputElement;
+}
 
-    // Run the code using JDoodle Compiler API.
-    async function runCode(language, languageCode, code) {
-        console.log("Running code: in language: ", language, " with language code: ", languageCode);
-        const { clientId, clientSecret, outputType } = await getSettings();
+// Run the code using JDoodle Compiler API.
+async function runCode(language, languageCode, code) {
+    console.log("Running code: in language: ", language, " with language code: ", languageCode);
+    const { clientId, clientSecret, outputType } = await getSettings();
 
-        chrome.runtime.sendMessage({ type: 'runCode', languageCode, code, clientId, clientSecret }, (response) => {
-            if (response && response.status === 200) {
-                console.log("Response from Compiler: ", response);
-                let outputResponse = "Compiler output: \n" + response.output;
-                // Print the output with type.
-                if (outputType == "codeblock") {
-                    displayOutput(outputResponse, language);
-                }
-                else {
-                    alert(outputResponse);
-                }
-            } else {
-                console.error("Error while running code: ", response.error);
-                alert("Error while running code\nPlease check console for more details");
+    chrome.runtime.sendMessage({ type: 'runCode', languageCode, code, clientId, clientSecret }, (response) => {
+        if (response && response.status === 200) {
+            console.log("Response from Compiler: ", response);
+            let outputResponse = "Compiler output: \n" + response.output;
+            // Print the output with type.
+            if (outputType == "codeblock") {
+                displayOutput(outputResponse, language);
             }
-        });
-    }
-
-
-    // Method to save the code to a file.
-    async function saveToFile(extension, data) {
-        const settings = await getSettings();
-        var { fileName, fileExtension } = settings;
-        fileExtension = extension || fileExtension;
-
-        const fileNameExtension = fileName + `${fileExtension}`;
-        const file = new Blob([data], { type: "text/plain" });
-        const url = URL.createObjectURL(file);
-
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = fileNameExtension;
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-
-        setTimeout(() => {
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }, 100);
-    }
-
-    // Add Save and Run Code buttons to all code containers.
-    async function addButtonToContainers() {
-        const containers = document.querySelectorAll('.flex.items-center.relative.text-gray-200.bg-gray-800.px-4.py-2.text-xs.font-sans.justify-between.rounded-t-md');
-
-        // Get the theme settings
-        const settings = await getSettings();
-        var theme = settings.theme;
-        theme = theme ? theme : "emerald_water";
-        const [fgColor, bgColor] = getThemeColors(theme);
-
-        containers.forEach(container => {
-            const existingFileButton = container.querySelector("#save-code-btn");
-            if (!existingFileButton) {
-                const button = createSaveFileButton(fgColor, bgColor, true);
-                container.appendChild(button);
-                button.addEventListener("click", () => handleSaveFileClick(container));
+            else {
+                alert(outputResponse);
             }
+        } else {
+            console.error("Error while running code: ", response.error);
+            alert("Error while running code\nPlease check console for more details");
+        }
+    });
+}
 
-            const existingRunCodeButton = container.querySelector("#run-code-btn");
-            if (!existingRunCodeButton) {
-                const button = createRunCodeButton(fgColor, bgColor, true);
-                container.appendChild(button);
-                button.addEventListener("click", () => handleRunCodeClick(container));
-            }
-            const copyButton = container.querySelector('button[class="flex ml-auto gap-2"]');
-            applyButtonTheme(copyButton, fgColor, bgColor, true);
-            removeSvgIcon();
-        });
 
-    }
+// Method to save the code to a file.
+async function saveToFile(extension, data) {
+    const settings = await getSettings();
+    var { fileName, fileExtension } = settings;
+    fileExtension = extension || fileExtension;
 
-    // Add buttons to existing code containers.
-    //setInterval(addButtonToContainers, 5000);
+    const fileNameExtension = fileName + `${fileExtension}`;
+    const file = new Blob([data], { type: "text/plain" });
+    const url = URL.createObjectURL(file);
 
-    // Creating the observer to add buttons to new code containers.
-    const observer = new MutationObserver(addButtonToContainers);
-    observer.observe(document.body, { childList: true, subtree: true });
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileNameExtension;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+
+    setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
+
+// Add Save and Run Code buttons to all code containers.
+async function addButtonToContainers() {
+    const containers = document.querySelectorAll('.flex.items-center.relative.text-gray-200.bg-gray-800.px-4.py-2.text-xs.font-sans.justify-between.rounded-t-md');
+
+    // Get the theme settings
+    const settings = await getSettings(true);
+    var theme = settings.theme;
+    theme = theme ? theme : "emerald_water";
+    const [fgColor, bgColor] = getThemeColors(theme);
+
+    containers.forEach(container => {
+        const existingFileButton = container.querySelector("#save-code-btn");
+        if (!existingFileButton) {
+            const button = createSaveFileButton(fgColor, bgColor, true);
+            container.appendChild(button);
+            button.addEventListener("click", () => handleSaveFileClick(container));
+        }
+
+        const existingRunCodeButton = container.querySelector("#run-code-btn");
+        if (!existingRunCodeButton) {
+            const button = createRunCodeButton(fgColor, bgColor, true);
+            container.appendChild(button);
+            button.addEventListener("click", () => handleRunCodeClick(container));
+        }
+        const copyButton = container.querySelector('button[class="flex ml-auto gap-2"]');
+        applyButtonTheme(copyButton, fgColor, bgColor, true);
+        removeSvgIcon();
+    });
+
+}
+
+// Add buttons to existing code containers.
+//setInterval(addButtonToContainers, 5000);
+
+// Creating the observer to add buttons to new code containers.
+const observer = new MutationObserver(addButtonToContainers);
+observer.observe(document.body, { childList: true, subtree: true });
 

@@ -8,20 +8,20 @@
     "https://api.jdoodle.com/v1/execute",
     "*://*/*"
   ],
-  "options_page": "options.html",
+  "options_page": "options/options.html",
   "icons": {
     "16": "icons/16.png",
     "48": "icons/48.png",
     "128": "icons/128.png"
   },
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "popup/popup.html",
     "default_icon": {"48": "icons/48.png"}
   },
   "content_scripts": [
     {
       "matches": ["https://chat.openai.com/*"],
-      "js": ["contentScript.js"]
+      "js": ["scripts/content-script.js"]
     }
   ],
   "background": {
