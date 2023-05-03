@@ -4,9 +4,8 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request && request.type === 'runCode') {
     const { languageCode, code, clientId, clientSecret } = request;
-    console.log("Running code: ", code, " in language code: ", languageCode);
+    console.log("Running code in language code: ", languageCode);
     const compilerApiUrl = "https://api.jdoodle.com/v1/execute";
-    console.log("API URL: ", compilerApiUrl)
 
     fetch(compilerApiUrl, {
       method: 'POST',
@@ -26,7 +25,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .then((data) => {
         if (data && data.output) {
           console.log('Service worker sending response:', data.output);
-          // When sending a successful response:
+          // Sending a successful response:
           sendResponse({ status: 200, output: data.output });
         } else {
           console.error('Unexpected API response:', data);
