@@ -1,4 +1,4 @@
-/* Description: This extension is used to save and run code snippets from the Chat-GPT-3 website.
+/* Description: This extension is used to save and run code snippets from the Chat-GPT website.
 It uses JDoodle Compiler API to run the code and display the output.
 Author : HeavenHM.
 Date : 03/05/2023 */
@@ -102,6 +102,7 @@ function createSaveFileButton(colorStyle = "green", backgroundColorStyle = "gray
     return button;
 }
 
+// Creating Run code button.
 function createRunCodeButton(colorStyle = "green", backgroundColorStyle = "gray", rawColorsHex = false) {
     const button = document.createElement("button");
     button.textContent = "Run code";
@@ -160,46 +161,42 @@ async function handleRunCodeClick(container) {
     }
 }
 
+// Helper method to get the data from the storage.
+function getFromStorage(keys) {
+    return new Promise((resolve) => {
+        chrome.storage.sync.get(keys, resolve);
+    });
+}
+
+// Method to get the settings from the storage.
 async function getSettings(initialRun = false) {
     try {
-        return new Promise((resolve, reject) => {
-            chrome.storage.sync.get(
-                ['apiKey', 'apiSecret', 'theme', 'fileName', 'fileExtension', 'outputType'],
-                (result) => {
-                    if (!result.apiKey || !result.apiSecret) {
-                        if (!initialRun) {
-                            const errorMsg = "Chat-GPT Code Runner:\nAPI Key or Secret not set\nPlease go to extension settings and set them";
-                            console.error(errorMsg);
-                            alert(errorMsg);
-                            reject(new Error(errorMsg));
-                        }
-                        else{
-                            const settings = {
-                                theme: result.theme,
-                                fileName: result.fileName,
-                                fileExtension: result.fileExtension,
-                                outputType: result.outputType,
-                            };
-                            resolve(settings);
-                        }
-                    } else {
-                        const settings = {
-                            clientId: result.apiKey,
-                            clientSecret: result.apiSecret,
-                            theme: result.theme,
-                            fileName: result.fileName,
-                            fileExtension: result.fileExtension,
-                            outputType: result.outputType,
-                        };
-                        resolve(settings);
-                    }
-                }
-            );
-        });
+        const { apiKey, apiSecret, theme, fileName, fileExtension, outputType } = await getFromStorage(['apiKey', 'apiSecret', 'theme', 'fileName', 'fileExtension', 'outputType']);
+
+        if (!apiKey || !apiSecret) {
+            if (!initialRun) {
+                const errorMsg = "Chat-GPT Code Runner:\nAPI Key or Secret not set\nPlease go to extension settings and set them";
+                console.error(errorMsg);
+                alert(errorMsg);
+                throw new Error(errorMsg);
+            }
+        }
+
+        const settings = {
+            clientId: apiKey,
+            clientSecret: apiSecret,
+            theme,
+            fileName,
+            fileExtension,
+            outputType,
+        };
+        return settings;
+
     } catch (error) {
         console.error("Failed to get settings:", error);
     }
 }
+
 
 // Display the output in the code container.
 function displayOutput(outputText, language) {
