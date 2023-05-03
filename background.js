@@ -26,13 +26,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .then((data) => {
         if (data && data.output) {
           console.log('Service worker sending response:', data.output);
-          sendResponse(data.output);
+          // When sending a successful response:
+          sendResponse({ status: 200, output: data.output });
         } else {
           console.error('Unexpected API response:', data);
+          // Sending an error response:
+          sendResponse({ status: 500, error: 'Unexpected API response' });
         }
       })
       .catch((error) => {
-        console.error('Error while fetching data from JDoodle API', error);
+        console.error('Error while fetching data from Compiler API :', error);
+        sendResponse({ status: 500, error: 'Error while fetching data from Compiler API' });
       });
 
     return true; // Indicate that the response will be sent asynchronously

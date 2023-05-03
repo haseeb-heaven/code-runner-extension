@@ -10,7 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const apiKey = document.getElementById('api-key').value;
     const apiSecret = document.getElementById('api-secret').value;
-  
+    // Check for empty values
+    if (!apiKey || !apiSecret) {
+        alert('Please enter both API Key and API Secret');
+        return;
+    }
+    
     chrome.storage.sync.set({ apiKey, apiSecret }, () => {
       console.log('Settings saved');
       alert('Settings saved');
