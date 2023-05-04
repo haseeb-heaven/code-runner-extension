@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "ChatGPT Code Runner",
   "version": "1.0",
-  "description": "Run and save the code in ChatGPT. Supports upto 70+ languages.",
+  "description": "Run and save the code in ChatGPT, Supports upto 70+ languages.",
   "permissions": ["storage", "activeTab", "clipboardRead"],
   "host_permissions": [
     "https://api.jdoodle.com/v1/execute",
