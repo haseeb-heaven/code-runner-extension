@@ -2,7 +2,7 @@
 # Chat-GPT Code Runner
 
 Chat-GPT Code Runner is a _Google Chrome_ extension that enables you to **Run Code** and **Save code** in more than **70 programming languages** using the **JDoodle Compiler _API_**. This powerful tool offers a variety of **themes** and the ability to _save_ your code locally. Enhance your coding experience with Chat-GPT Code Runner!
-
+- **Support this Project** <a href="https://www.buymeacoffee.com/haseebheaven"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=haseebheaven&button_colour=40DCA5&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" /></a>
 ## Features
 
 - **Save Code Locally**: Save your code to your local machine for easy access and management.
